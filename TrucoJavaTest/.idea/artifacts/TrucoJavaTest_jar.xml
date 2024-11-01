@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TrucoJavaTest:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TrucoJavaTest_jar</output-path>
+    <root id="archive" name="TrucoJavaTest.jar">
+      <element id="module-output" name="TrucoJavaTest" />
+    </root>
+  </artifact>
+</component>
