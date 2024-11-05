@@ -18,15 +18,6 @@ public class TrucoClientGUI {
     private String playerName;
 
 
-    public Integer getPontos() {
-        return pontos;
-    }
-
-    public void setPontos(Integer pontos) {
-        this.pontos = pontos;
-    }
-
-
     public TrucoClientGUI(String playerName) {
         this.playerName = playerName;
         setupConnection();
@@ -70,6 +61,7 @@ public class TrucoClientGUI {
         // Painel de botões para jogar cartas
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
+
 
 
         String[] cartas = {"Magaiver", "Carta 2", "Carta 3"};

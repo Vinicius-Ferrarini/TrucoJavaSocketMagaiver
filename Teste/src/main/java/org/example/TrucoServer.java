@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.repository.Baralho;
+
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ public class TrucoServer {
     private static HashMap<Integer, PrintWriter> clientes = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
+        Baralho baralho = new Baralho();
         ServerSocket serverSocket = new ServerSocket(PORT);
         System.out.println("Servidor de Truco iniciado na porta " + PORT);
 
