@@ -14,8 +14,8 @@ public class Baralho {
         String[] valores = {"4","5","6","7","Q","J","K","A","2","3"};
 
         //cria baralho
-        for(String naipe : naipes){
-            for (String valor : valores){
+        for (String valor : valores){
+            for(String naipe : naipes){
                 cartas.add(new Cartas(naipe,valor));
             }
         }

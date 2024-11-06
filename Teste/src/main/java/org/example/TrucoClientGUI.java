@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.repository.Baralho;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -61,20 +63,47 @@ public class TrucoClientGUI {
         // Painel de botões para jogar cartas
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
+        frame.add(buttonPanel, BorderLayout.SOUTH);
 
+        frame.setVisible(true);
 
+        // Inicia a thread para ouvir mensagens do servidor
+        new Thread(() -> {
+            try {
+                String serverMessage;
+                while ((serverMessage = in.readLine()) != null) {
+                    if (serverMessage.startsWith("Suas cartas: ")) {
+                        // Extrai as cartas do servidor
+                        String cartasString = serverMessage.substring(13);
+                        String[] cartas = cartasString.split(", ");
+                        exibirCartas(cartas, buttonPanel);
+                    } else {
+                        messageArea.append(serverMessage + "\n");
+                    }
+                }
+            } catch (IOException e) {
+                messageArea.append("Erro ao ler mensagens do servidor.\n");
+            }
+        }).start();
+    }
 
-        String[] cartas = {"Magaiver", "Carta 2", "Carta 3"};
+    // Metodo que exibe as cartas na interface
+    private void exibirCartas(String[] cartas, JPanel buttonPanel) {
+        buttonPanel.removeAll();  // Remove os botões antigos
+
+        // Cria um botão para cada carta
         for (String carta : cartas) {
             JButton cartaButton = new JButton(carta);
             cartaButton.addActionListener(new JogadaActionListener(carta));
             buttonPanel.add(cartaButton);
         }
 
-        frame.add(buttonPanel, BorderLayout.SOUTH);
-
-        frame.setVisible(true);
+        // Atualiza a interface gráfica
+        buttonPanel.revalidate();
+        buttonPanel.repaint();
     }
+
+
 
     private class JogadaActionListener implements ActionListener {
         private String jogada;

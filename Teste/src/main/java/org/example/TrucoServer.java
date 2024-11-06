@@ -1,17 +1,19 @@
 package org.example;
 
 import org.example.repository.Baralho;
+import org.example.repository.Cartas;
 
 import java.io.*;
 import java.net.*;
 import java.util.HashMap;
+import java.util.List;
 
 public class TrucoServer {
     private static final int PORT = 12345;
     private static HashMap<Integer, PrintWriter> clientes = new HashMap<>();
+    static Baralho baralho = new Baralho();
 
     public static void main(String[] args) throws IOException {
-        Baralho baralho = new Baralho();
         ServerSocket serverSocket = new ServerSocket(PORT);
         System.out.println("Servidor de Truco iniciado na porta " + PORT);
 
@@ -26,6 +28,20 @@ public class TrucoServer {
             System.out.println("Cliente " + clientCount + " conectado.");
 
             new Thread(new ClientHandler(clientCount, in)).start();
+        }
+        distribuirCartas();
+    }
+
+    private static void distribuirCartas(){
+        baralho.embaralhar();
+
+        for (int id : clientes.keySet()){
+            List<Cartas> mao = baralho.distribuirCartas(3);
+            StringBuilder maoStr = new StringBuilder();
+            for (Cartas carta : mao){
+                maoStr.append(carta).append(", ");
+            }
+            clientes.get(id).println("Suas cartas: " + maoStr);
         }
     }
 
