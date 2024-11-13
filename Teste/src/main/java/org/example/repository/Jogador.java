@@ -1,68 +1,73 @@
-package org.example.repository;
+public class TrucoGame {
+    private List<Jogador> jogadores;
+    private Baralho baralho;
+    private int turnoAtual;
+    private int valorRodada;
 
-import java.util.List;
-
-public class Jogador {
-    private int id;
-    private List<Cartas> mao;
-    private Integer pontuacao;  //partida atual
-    private Integer time;
-    private boolean vez;
-    private int pontosTotais;
-
-    public int getId() {
-        return id;
+    public TrucoGame() {
+        this.jogadores = new ArrayList<>();
+        this.baralho = new Baralho();  // Usa a classe Baralho que você forneceu
+        this.turnoAtual = 0;  // Começa com o jogador 1
+        this.valorRodada = 1;  // Valor inicial da rodada
+        baralho.embaralhar();  // Embaralha as cartas ao iniciar
     }
 
-    public void setId(int id) {
-        this.id = id;
+    // Adiciona um jogador ao jogo
+    public void adicionarJogador(Jogador jogador) {
+        jogadores.add(jogador);
     }
 
-    public List<Cartas> getMao() {
-        return mao;
+    // Inicializa e distribui as cartas aos jogadores
+    public void distribuirCartas() {
+        baralho.embaralhar();  // Embaralha novamente antes de distribuir
+        for (Jogador jogador : jogadores) {
+            List<Cartas> mao = baralho.distribuirCartas(3);  // Distribui 3 cartas por jogador
+            jogador.receberCartas(mao);  // Atualiza a mão do jogador
+        }
     }
 
-    public void setMao(List<Cartas> mao) {
-        this.mao = mao;
+    // Alterna o turno entre os jogadores
+    public void alternarTurno() {
+        turnoAtual = (turnoAtual + 1) % jogadores.size();  // Alterna entre 0 e 1 para dois jogadores
     }
 
-    public Integer getPontuacao() {
-        return pontuacao;
+    // Exibe informações do jogo
+    public void exibirInformacoes() {
+        System.out.println("Jogo iniciado. Turno atual: Jogador " + (turnoAtual + 1));
+        System.out.println("Valor da rodada: " + valorRodada);
     }
 
-    public void setPontuacao(Integer pontuacao) {
-        this.pontuacao = pontuacao;
+    // Método para rodar uma rodada
+    public void rodarRodada() {
+        // Distribuir as cartas no início da rodada
+        distribuirCartas();
+        exibirInformacoes();
+
+        // A lógica para cada jogador jogar uma carta
+        Jogador jogadorAtual = jogadores.get(turnoAtual);
+        // Aqui vamos supor que o jogador escolhe a carta de forma automatizada por enquanto
+        System.out.println("Jogador " + jogadorAtual.getId() + " está jogando.");
+
+        // Simulando uma jogada onde o jogador escolhe a primeira carta da mão
+        Cartas cartaJogada = jogadorAtual.getMao().get(0);
+        System.out.println("Jogador " + jogadorAtual.getId() + " jogou: " + cartaJogada);
+
+        // Alternar o turno após a jogada
+        alternarTurno();
     }
 
-    public Integer getTime() {
-        return time;
-    }
+    public static void main(String[] args) {
+        TrucoGame jogo = new TrucoGame();
 
-    public void setTime(Integer time) {
-        this.time = time;
-    }
+        // Criando jogadores
+        Jogador jogador1 = new Jogador(1);
+        Jogador jogador2 = new Jogador(2);
 
-    public boolean isVez() {
-        return vez;
-    }
+        // Adicionando os jogadores
+        jogo.adicionarJogador(jogador1);
+        jogo.adicionarJogador(jogador2);
 
-    public void setVez(boolean vez) {
-        this.vez = vez;
-    }
-
-    public int getPontosTotais() {
-        return pontosTotais;
-    }
-
-    public void setPontosTotais(int pontosTotais) {
-        this.pontosTotais = pontosTotais;
-    }
-
-    public void receberCartas(List<Cartas> cartas){
-        this.mao = cartas;
-    }
-
-    public void mostrarMao(){
-        System.out.println("Mao do jogador: " + mao);
+        // Iniciando a primeira rodada
+        jogo.rodarRodada();
     }
 }

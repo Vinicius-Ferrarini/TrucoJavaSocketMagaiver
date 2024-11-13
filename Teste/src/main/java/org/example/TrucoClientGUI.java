@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.repository.Baralho;
+import org.example.repository.Cartas;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ public class TrucoClientGUI {
     private BufferedReader in;
     private JTextArea messageArea;
     private String playerName;
-
+    private JPanel buttonPanel;
 
     public TrucoClientGUI(String playerName) {
         this.playerName = playerName;
@@ -37,7 +37,18 @@ public class TrucoClientGUI {
                 try {
                     String serverMessage;
                     while ((serverMessage = in.readLine()) != null) {
-                        messageArea.append(serverMessage + "\n");
+                        if (serverMessage.equals("Sua vez de jogar.")) {
+                            habilitarCartas(true);
+                        } else if (serverMessage.equals("Aguarde o outro jogador.")) {
+                            habilitarCartas(false);
+                        } else if (serverMessage.startsWith("Suas cartas: ")) {
+                            // Extrai as cartas do servidor e exibe
+                            String cartasString = serverMessage.substring(13);
+                            String[] cartas = cartasString.split(", ");
+                            exibirCartas(cartas);
+                        } else {
+                            messageArea.append(serverMessage + "\n");
+                        }
                     }
                 } catch (IOException e) {
                     messageArea.append("Erro ao ler mensagens do servidor.\n");
@@ -54,68 +65,73 @@ public class TrucoClientGUI {
         frame.setSize(400, 300);
         frame.setLayout(new BorderLayout());
 
-        // Área de mensagens
         messageArea = new JTextArea();
         messageArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(messageArea);
         frame.add(scrollPane, BorderLayout.CENTER);
 
-        // Painel de botões para jogar cartas
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout()); // Garantir que os botões usem FlowLayout
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
-
-        // Inicia a thread para ouvir mensagens do servidor
-        new Thread(() -> {
-            try {
-                String serverMessage;
-                while ((serverMessage = in.readLine()) != null) {
-                    if (serverMessage.startsWith("Suas cartas: ")) {
-                        // Extrai as cartas do servidor
-                        String cartasString = serverMessage.substring(13);
-                        String[] cartas = cartasString.split(", ");
-                        exibirCartas(cartas, buttonPanel);
-                    } else {
-                        messageArea.append(serverMessage + "\n");
-                    }
-                }
-            } catch (IOException e) {
-                messageArea.append("Erro ao ler mensagens do servidor.\n");
-            }
-        }).start();
     }
 
-    // Metodo que exibe as cartas na interface
-    private void exibirCartas(String[] cartas, JPanel buttonPanel) {
-        buttonPanel.removeAll();  // Remove os botões antigos
+    private void exibirCartas(String[] cartas) {
+        // Limpa qualquer carta anterior
+        buttonPanel.removeAll();
 
-        // Cria um botão para cada carta
-        for (String carta : cartas) {
-            JButton cartaButton = new JButton(carta);
-            cartaButton.addActionListener(new JogadaActionListener(carta));
-            buttonPanel.add(cartaButton);
+        // Adiciona os botões das cartas recebidas
+        for (String cartaStr : cartas) {
+            // Divide a string de carta em valor e naipe
+            String[] cartaInfo = cartaStr.split(" de ");
+            if (cartaInfo.length == 2) {
+                Cartas carta = new Cartas(cartaInfo[0], cartaInfo[1]);
+
+                // Cria um botão para a carta
+                JButton cartaButton = new JButton(carta.toString());
+                cartaButton.addActionListener(new JogadaActionListener(carta, cartaButton));
+
+                // Adiciona o botão ao painel
+                buttonPanel.add(cartaButton);
+            }
         }
 
-        // Atualiza a interface gráfica
-        buttonPanel.revalidate();
-        buttonPanel.repaint();
+        // Atualiza o painel e o layout
+        buttonPanel.revalidate();  // Garantir que o layout do painel seja reavaliado
+        buttonPanel.repaint();     // Redesenha o painel para refletir as mudanças
+
+        // Desabilita os botões até a vez do jogador
+        habilitarCartas(false);
     }
 
-
+    private void habilitarCartas(boolean habilitar) {
+        for (Component component : buttonPanel.getComponents()) {
+            component.setEnabled(habilitar);
+        }
+    }
 
     private class JogadaActionListener implements ActionListener {
-        private String jogada;
+        private Cartas jogada;
+        private JButton cartaButton;
 
-        public JogadaActionListener(String jogada) {
+        public JogadaActionListener(Cartas jogada, JButton cartaButton) {
             this.jogada = jogada;
+            this.cartaButton = cartaButton;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             out.println(playerName + " jogou " + jogada);
             messageArea.append("Você jogou: " + jogada + "\n");
+
+            // Remove o botão da carta jogada
+            buttonPanel.remove(cartaButton);
+            buttonPanel.revalidate();
+            buttonPanel.repaint();
+
+            // Desabilita as cartas após jogar
+            habilitarCartas(false);
         }
     }
 
