@@ -1,73 +1,110 @@
-public class TrucoGame {
-    private List<Jogador> jogadores;
-    private Baralho baralho;
-    private int turnoAtual;
-    private int valorRodada;
+package org.example.repository;
 
-    public TrucoGame() {
-        this.jogadores = new ArrayList<>();
-        this.baralho = new Baralho();  // Usa a classe Baralho que você forneceu
-        this.turnoAtual = 0;  // Começa com o jogador 1
-        this.valorRodada = 1;  // Valor inicial da rodada
-        baralho.embaralhar();  // Embaralha as cartas ao iniciar
+import java.util.List;
+
+public class Jogador {
+    private int id;
+    private List<Cartas> mao;
+    private Integer pontuacao;  // Partida atual
+    private Integer time;
+    private boolean vez;
+    private int pontosTotais; // Pontos acumulados de várias partidas
+    private int rodadasGanhas; // Rodadas ganhas na partida atual
+
+    public Jogador(int id) {
+        this.id = id;
+        this.pontuacao = 0;
+        this.pontosTotais = 0;
+        this.rodadasGanhas = 0;
     }
 
-    // Adiciona um jogador ao jogo
-    public void adicionarJogador(Jogador jogador) {
-        jogadores.add(jogador);
+    public int getId() {
+        return id;
     }
 
-    // Inicializa e distribui as cartas aos jogadores
-    public void distribuirCartas() {
-        baralho.embaralhar();  // Embaralha novamente antes de distribuir
-        for (Jogador jogador : jogadores) {
-            List<Cartas> mao = baralho.distribuirCartas(3);  // Distribui 3 cartas por jogador
-            jogador.receberCartas(mao);  // Atualiza a mão do jogador
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<Cartas> getMao() {
+        return mao;
+    }
+
+    public void setMao(List<Cartas> mao) {
+        this.mao = mao;
+    }
+
+    public Integer getPontuacao() {
+        return pontuacao;
+    }
+
+    public void setPontuacao(Integer pontuacao) {
+        this.pontuacao = pontuacao;
+    }
+
+    public Integer getTime() {
+        return time;
+    }
+
+    public void setTime(Integer time) {
+        this.time = time;
+    }
+
+    public boolean isVez() {
+        return vez;
+    }
+
+    public void setVez(boolean vez) {
+        this.vez = vez;
+    }
+
+    public int getPontosTotais() {
+        return pontosTotais;
+    }
+
+    public void setPontosTotais(int pontosTotais) {
+        this.pontosTotais = pontosTotais;
+    }
+
+    public int getRodadasGanhas() {
+        return rodadasGanhas;
+    }
+
+    public void setRodadasGanhas(int rodadasGanhas) {
+        this.rodadasGanhas = rodadasGanhas;
+    }
+
+    // Adiciona uma nova mão de cartas ao jogador
+    public void receberCartas(List<Cartas> cartas) {
+        this.mao = cartas;
+    }
+
+    // Exibe as cartas na mão do jogador
+    public void mostrarMao() {
+        System.out.println("Mão do jogador " + id + ": " + mao);
+    }
+
+    // Incrementa a contagem de rodadas ganhas
+    public void ganharRodada() {
+        this.rodadasGanhas++;
+    }
+
+    // Reseta as rodadas ganhas, usado no início de uma nova partida
+    public void resetarRodadasGanhas() {
+        this.rodadasGanhas = 0;
+    }
+
+    // Atualiza a pontuação total do jogador com base nas rodadas ganhas
+    public void atualizarPontuacaoPartida() {
+        if (rodadasGanhas >= 2) {
+            this.pontosTotais += 1; // Considerando que vencer uma partida dá 1 ponto ao jogador
+            System.out.println("Jogador " + id + " venceu a partida! Pontuação total: " + pontosTotais);
         }
     }
 
-    // Alterna o turno entre os jogadores
-    public void alternarTurno() {
-        turnoAtual = (turnoAtual + 1) % jogadores.size();  // Alterna entre 0 e 1 para dois jogadores
-    }
-
-    // Exibe informações do jogo
-    public void exibirInformacoes() {
-        System.out.println("Jogo iniciado. Turno atual: Jogador " + (turnoAtual + 1));
-        System.out.println("Valor da rodada: " + valorRodada);
-    }
-
-    // Método para rodar uma rodada
-    public void rodarRodada() {
-        // Distribuir as cartas no início da rodada
-        distribuirCartas();
-        exibirInformacoes();
-
-        // A lógica para cada jogador jogar uma carta
-        Jogador jogadorAtual = jogadores.get(turnoAtual);
-        // Aqui vamos supor que o jogador escolhe a carta de forma automatizada por enquanto
-        System.out.println("Jogador " + jogadorAtual.getId() + " está jogando.");
-
-        // Simulando uma jogada onde o jogador escolhe a primeira carta da mão
-        Cartas cartaJogada = jogadorAtual.getMao().get(0);
-        System.out.println("Jogador " + jogadorAtual.getId() + " jogou: " + cartaJogada);
-
-        // Alternar o turno após a jogada
-        alternarTurno();
-    }
-
-    public static void main(String[] args) {
-        TrucoGame jogo = new TrucoGame();
-
-        // Criando jogadores
-        Jogador jogador1 = new Jogador(1);
-        Jogador jogador2 = new Jogador(2);
-
-        // Adicionando os jogadores
-        jogo.adicionarJogador(jogador1);
-        jogo.adicionarJogador(jogador2);
-
-        // Iniciando a primeira rodada
-        jogo.rodarRodada();
+    // Reseta as pontuações para uma nova partida
+    public void resetarPontuacao() {
+        this.pontuacao = 0;
+        this.rodadasGanhas = 0;
     }
 }
